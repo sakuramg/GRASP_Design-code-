@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * 代码清单2-2：小票职责分配的断言。
- * 固定数据沿用第一章的49元小票：A 1250分×2，B 800分×3。
+ * 代码清单2-4：小票职责分配的断言（2.2.1、2.2.3）。
+ * 固定数据沿用章首的4900分小票：商品A 1250分×2，商品B 800分×3。
  */
 class SaleTest {
 
@@ -25,7 +25,7 @@ class SaleTest {
     }
 
     @Test
-    @DisplayName("行小计与整单合计与第一章的固定小票一致")
+    @DisplayName("行小计与整单合计与章首4900分小票一致")
     void subtotalAndTotalMatchTheFixedReceipt() {
         Sale sale = fixedReceipt();
         List<SaleLineItem> lines = sale.getLineItems();
@@ -45,7 +45,7 @@ class SaleTest {
         itemA.changePrice(1500L);   // 商品档案调价
 
         assertEquals(2500L, sale.getLineItems().get(0).subtotalCents(),
-                "已成交的小票仍按成交价计算");
+                "已成交的小票仍按成交价快照计算");
     }
 
     @Test
@@ -56,7 +56,7 @@ class SaleTest {
     }
 
     @Test
-    @DisplayName("非法数量在创建流水行时就被拒绝")
+    @DisplayName("非法数量在创建流水行时被拒绝")
     void invalidQuantityRejectedAtCreation() {
         assertThrows(IllegalArgumentException.class,
                 () -> new SaleLineItem(new Item("A", 1250L), 0));

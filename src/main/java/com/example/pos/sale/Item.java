@@ -1,7 +1,7 @@
 package com.example.pos.sale;
 
 /**
- * 商品信息对象（教学简化）。
+ * 商品信息对象（2.1.1、2.3.1）。
  * 金额单位为整数分，字段与方法以 Cents 结尾。
  */
 public class Item {
@@ -23,8 +23,7 @@ public class Item {
     }
 
     /**
-     * 修改价格。校验由商品自己负责，调用方不可能绕过。
-     * 代码清单2-6 的正例就是改走这个入口。
+     * 修改价格。合法性校验由商品对象自己负责（代码清单2-12正例调用此入口）。
      */
     public void changePrice(long newPriceCents) {
         if (newPriceCents < 0) {
