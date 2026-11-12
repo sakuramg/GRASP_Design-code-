@@ -14,10 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class TaxAdapterTest {
 
     @Test
-    @DisplayName("按当前税率计算税额")
+    @DisplayName("从优惠后含税金额中反向拆分税额")
     void taxFollowsCurrentRate() {
-        long tax = new TaxAdapter().taxOf(4900L);
-        assertEquals(4900L * 3 / 100, tax);
+        // 优惠后应付 4400 分，当前默认税率 3%：4400 * 3 / 103 ≈ 128 分
+        long tax = new TaxAdapter().taxOf(4400L);
+        long expected = Math.round(4400.0 * 3 / 103.0);
+        assertEquals(expected, tax);
     }
 
     @Test

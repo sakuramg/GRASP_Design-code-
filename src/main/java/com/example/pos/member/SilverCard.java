@@ -1,9 +1,11 @@
 package com.example.pos.member;
 
+/**
+ * 银卡会员：享受 9.8 折（98%）。
+ */
 public class SilverCard extends MemberCard {
-
     @Override
     public int discountPercent() {
-        return 92;   // 银卡92折
+        return 98;
     }
 }

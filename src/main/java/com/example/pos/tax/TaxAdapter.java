@@ -3,7 +3,7 @@ package com.example.pos.tax;
 /**
  * 代码清单2-23：税费计算的中间对象（正例，2.5.2）。
  * 税金中间对象：税率读取与税金计算的唯一归属地。
- * 中间对象可以是具体类、抽象类或接口——在仅有一种计税通道时，具体类最为简洁。
+ * 中间对象可以是具体类、抽象类或接口。
  */
 public class TaxAdapter {
 
@@ -12,8 +12,12 @@ public class TaxAdapter {
         return TaxPolicyConfig.currentRate();
     }
 
-    /** 根据整单金额计算税金 */
-    public long taxOf(long totalCents) {
-        return totalCents * currentRatePercent() / 100;
+    /**
+     * 根据优惠后含税应付金额（grossCents）反向拆分出票面展示税额：
+     * 公式：grossCents * rate / (100 + rate)
+     */
+    public long taxOf(long grossCents) {
+        int rate = currentRatePercent();
+        return Math.round((double) grossCents * rate / (100.0 + rate));
     }
 }

@@ -49,6 +49,6 @@ public class CheckoutController {
     }
 
     public long calculateTaxCents() {
-        return taxAdapter.taxOf(sale.totalCents());         // 总额归小票，计税归计税对象
+        return taxAdapter.taxOf(sale.amountDueCents());     // 基于优惠后含税金额拆分展示税额
     }
 }
