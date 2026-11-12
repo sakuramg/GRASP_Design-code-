@@ -12,9 +12,11 @@
 
 二、运行方式
   在本目录（含 pom.xml）下执行：
-      mvn test                               运行全部单元测试（共29个）
+      mvn test                               运行全部单元测试（共46个，其中习题答案17个）
       mvn test -Dtest=SaleTest               只运行小票断言（代码2-5）
       mvn -q compile                         只编译
+      mvn -q compile && java -cp target/classes com.example.pos.answerkey.Chapter02Answers
+                                             运行习题参考答案的核对程序
   测试核对的正文数字：
       行小计 2500 分、2400 分，合计 4900 分，满4000减500后应付 4400 分（sale/SaleTest）
       会员折扣 普通100/银卡98/金卡96/铂金95，以4900分为基数得 4900/4802/4704/4655 分（member/MemberCardTest）
@@ -85,3 +87,20 @@
   - 代码2-25：图2-13 的 JinIIAdapter（6%）、JinIIIAdapter（11%）正文只出现在图中，补充为只重写 getRate() 的子类。
   - 代码2-29：PaymentService 只保留正文的 (PaymentGateway, Executor) 构造方法。
   - src/main/resources/frontend/receipt-callback.js 是 2.6 节正文提到的前端 Promise 链式回调补充示例，定稿未单列代码编号。
+
+六、习题参考答案代码（answer_key）
+  正文路径：配套代码/chapter02/answer_key/Chapter02Answers.java
+  仓库路径：src/main/java/com/example/pos/answerkey/Chapter02Answers.java
+           （Maven 工程按包名 com.example.pos.answerkey 存放，与正文路径为同一文件）
+  测试路径：src/test/java/com/example/pos/answerkey/Chapter02AnswersTest.java
+  对应习题与核对的数字：
+      2-1   商品A买满5件打8折，行小计 1250×5×80÷100＝5000 分
+      2-6   4400 分在 3%、6%、11% 下税额 128、249、436 分，不含税 4272、4151、3964 分；
+            整数写法 26503÷206＝128
+      2-7   4900 分按 100/98/96/95 得 4900/4802/4704/4655 分
+      2-8   主控系统只依赖 PowerSystem、BrakeSystem、EntertainmentSystem 接口，换双电机实现不改主控系统
+      2-9   MyButton 只持有 ButtonAction 接口，单击、双击功能由装配代码注入
+      2-10  四个场景应付 4400 分、税额 128 分、各扣款 1 次；成功关闭并打印 1 次；拒绝不关闭、打印 0 次；
+            待确认按流水号查询原交易后关闭、打印 1 次；重复成功通知仍只打印 1 次；
+            新增 RefundAction 实现 Action，经 setAction 改配，Button 与 CheckoutController 不变
+  答案代码只放在 answerkey 包中，与正文示例代码分开，不修改正文代码清单对应的源文件。
