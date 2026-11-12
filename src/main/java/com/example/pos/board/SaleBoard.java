@@ -1,52 +1,29 @@
+// 代码2-21  收银键盘与键位功能的装配
 package com.example.pos.board;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * 代码2-20：键位与功能的装配（2.5.1，图2-10）。
- */
 public class SaleBoard {
+    private final List<Button> buttons = new ArrayList<>();
 
-    private final Map<String, Button> buttons = new HashMap<>();
-
-    public SaleBoard() {
-        buttons.put("M", new Button());
-        buttons.put("Y", new Button());
-        buttons.put("P", new Button());
+    public void addButton(Button button) {
+        buttons.add(button);
     }
 
-    public Button getButton(String key) {
-        return buttons.computeIfAbsent(key, k -> new Button());
-    }
-
-    /** 演示代码2-20的键位装配过程 */
-    public static SaleBoard createDefaultConfiguredBoard() {
-        SaleBoard board = new SaleBoard();
-        board.getButton("M").setAction(new QueryMemberAction());   // M键 = 查询会员
-        board.getButton("Y").setAction(new VipPaymentAction());    // Y键 = 储值消费
-        board.getButton("P").setAction(new ItemQueryAction());     // P键 = 商品查询
-        return board;
-    }
-
-    public static class QueryMemberAction implements Action {
-        @Override
-        public void execute() {
-            System.out.println("执行查询会员");
+    public Button getButton(String keyName) {
+        for (Button button : buttons) {
+            if (button.getKeyName().equals(keyName)) {
+                return button;
+            }
         }
+        throw new IllegalArgumentException("未知键位：" + keyName);
     }
 
-    public static class VipPaymentAction implements Action {
-        @Override
-        public void execute() {
-            System.out.println("执行会员储值消费");
-        }
-    }
-
-    public static class ItemQueryAction implements Action {
-        @Override
-        public void execute() {
-            System.out.println("执行商品查询");
-        }
+    public void configure() {
+        // 调整键位或新增功能，只修改这里的装配语句
+        getButton("M").setAction(new QueryMemberAction());
+        getButton("Y").setAction(new VipPaymentAction());
+        getButton("P").setAction(new ItemQueryAction());
     }
 }

@@ -1,3 +1,4 @@
+// 代码2-29 / 代码2-28 所依赖的支撑类型（正文未单列清单）
 package com.example.pos.checkout;
 
 /** 支付网关返回的凭据。 */

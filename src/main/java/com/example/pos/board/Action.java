@@ -1,9 +1,6 @@
+// 代码2-20  按键与功能分离（正例）——Action接口
 package com.example.pos.board;
 
-/**
- * 收银台按键功能抽象契约（代码2-19，2.5.1）。
- */
 public interface Action {
-
-    void execute();
+    void actionPerformed();
 }

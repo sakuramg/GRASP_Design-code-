@@ -1,22 +1,25 @@
+// 代码2-20  按键与功能分离（正例）——Button
 package com.example.pos.board;
 
-/**
- * 代码2-19：按键与功能分离（正例，2.5.1）。
- * 按键本身只负责触发动作，不认识任何具体的业务功能实现。
- */
 public class Button {
+    private final String keyName;
+    private Action action;                    // 只引用抽象功能，不引用具体功能类
 
-    private Action action;                    // 仅引用抽象功能契约
+    public Button(String keyName) {
+        this.keyName = keyName;
+    }
 
-    /** 注入要执行的功能实现——更换按键功能只需替换注入的对象 */
+    public String getKeyName() {
+        return keyName;
+    }
+
     public void setAction(Action action) {
         this.action = action;
     }
 
-    /** 按键被按下时触发：委托给抽象功能契约执行 */
     public void onClick() {
         if (action != null) {
-            action.execute();
+            action.actionPerformed();         // 委托给注入的功能对象
         }
     }
 }

@@ -1,3 +1,4 @@
+// 代码2-25  测试辅助：调用 TaxPolicyConfig 的包内税率更新入口
 package com.example.pos.tax;
 
 /**

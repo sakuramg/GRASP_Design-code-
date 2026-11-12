@@ -1,11 +1,7 @@
+// 代码2-23  会员打折代码的多态实现（重构后）——SilverCard
 package com.example.pos.member;
 
-/**
- * 银卡会员：享受 9.8 折（98%）。
- */
 public class SilverCard extends MemberCard {
     @Override
-    public int discountPercent() {
-        return 98;
-    }
+    public int discountPercent() { return 98; }
 }

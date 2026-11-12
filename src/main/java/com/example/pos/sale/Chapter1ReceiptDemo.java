@@ -1,9 +1,10 @@
+// 代码2-1  依据第一章代码1-3改写的行小计、汇总与整单优惠
 package com.example.pos.sale;
 
 import java.util.List;
 
 /**
- * 代码2-1：依据第一章代码1-3改写的行小计、汇总与整单优惠。
+ * 正文中两个 record 是顶层类型；这里嵌套在 Chapter1ReceiptDemo 中，以免与正式类 Sale、SaleLineItem 重名。
  */
 public final class Chapter1ReceiptDemo {
 

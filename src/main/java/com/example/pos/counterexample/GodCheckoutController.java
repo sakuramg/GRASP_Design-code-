@@ -1,15 +1,12 @@
+// 代码2-15  承担四种变化原因的结算控制器（反例）
 package com.example.pos.counterexample;
 
 import com.example.pos.sale.Sale;
 import com.example.pos.sale.SaleLineItem;
 
-/**
- * 代码2-13：承担四种变化原因的结算控制器（反例，2.3.2）。
- * 正例见 com.example.pos.checkout.CheckoutController（代码2-18）。
- */
+/** 低内聚反例，仅供对照。正例见 com.example.pos.checkout.CheckoutController（代码2-19）。 */
 @Deprecated
 public class GodCheckoutController {
-
     public void settle(Sale sale) {
         long totalCents = 0L;
         for (SaleLineItem line : sale.getLineItems()) {

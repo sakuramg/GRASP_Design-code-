@@ -1,8 +1,10 @@
+// 代码2-2  SaleLineItem保存成交价快照（Item部分：商品名称与当前标价）
+// 代码2-14 通过商品公开的方法调价（正例）所调用的 setUnitPriceCents 合法入口
 package com.example.pos.sale;
 
 /**
- * 商品信息对象（2.1.1、2.3.1）。
- * 金额单位为整数分，字段与方法以 Cents 结尾。
+ * 商品：保存名称和当前标价，金额单位为整数分。
+ * 单价字段为 private，只能经 setUnitPriceCents 修改，负数由商品对象拒绝。
  */
 public class Item {
 
@@ -11,7 +13,7 @@ public class Item {
 
     public Item(String name, long unitPriceCents) {
         this.name = name;
-        changePrice(unitPriceCents);
+        setUnitPriceCents(unitPriceCents);
     }
 
     public String getName() {
@@ -22,13 +24,11 @@ public class Item {
         return unitPriceCents;
     }
 
-    /**
-     * 修改价格。合法性校验由商品对象自己负责（代码2-12正例调用此入口）。
-     */
-    public void changePrice(long newPriceCents) {
-        if (newPriceCents < 0) {
-            throw new IllegalArgumentException("价格不能为负：" + newPriceCents);
+    /** 合法入口：先检查价格不小于零，再修改内部字段。 */
+    public void setUnitPriceCents(long unitPriceCents) {
+        if (unitPriceCents < 0) {
+            throw new IllegalArgumentException("价格不能为负：" + unitPriceCents);
         }
-        this.unitPriceCents = newPriceCents;
+        this.unitPriceCents = unitPriceCents;
     }
 }

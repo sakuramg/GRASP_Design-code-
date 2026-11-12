@@ -1,11 +1,7 @@
+// 代码2-23  会员打折代码的多态实现（重构后）——PlatinumCard
 package com.example.pos.member;
 
-/**
- * 铂金卡会员：享受 9.5 折（95%）。
- */
 public class PlatinumCard extends MemberCard {
     @Override
-    public int discountPercent() {
-        return 95;
-    }
+    public int discountPercent() { return 95; }
 }

@@ -1,11 +1,9 @@
+// 代码2-28  结果处理的实现（片段）
 package com.example.pos.checkout;
 
 import com.example.pos.sale.Sale;
 
-/**
- * 代码2-27：结果处理的实现（片段，2.6.2）。
- * 支付完成回调处理器：协调小票状态变更、触发后续打印并切回UI线程刷新界面。
- */
+/** 回调的提供者：onSuccess 对应七步演进中的“记账()”。 */
 public class CheckoutCompletion implements PaymentCallback {
 
     private final CheckoutController controller;

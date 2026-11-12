@@ -1,43 +1,58 @@
+// 代码2-16  会员模块的继承链、包内协作与统一入口（关键代码）
 package com.example.pos.member;
-
 import java.util.HashMap;
 import java.util.Map;
-
-/**
- * 代码2-14：会员模块的受控入口与包内协作（关键代码，2.3.3）。
- * 对外入口：先做运行期授权，再委托包内对象。
- */
+// 普通会员：继承链的根，类本身不对包外公开
+class Member {
+    private final String memberId;
+    protected long balanceCents;
+    protected long points;
+    Member(String memberId) { this.memberId = memberId; }
+    public String getMemberId() { return memberId; }
+    // 包级私有：包外模块不能直接调用
+    void addPoints(long paidCents) { points += paidCents / 100; }
+    void consume(long amountCents) {
+        if (amountCents > balanceCents) {
+            throw new IllegalStateException("储值余额不足");
+        }
+        balanceCents -= amountCents;
+    }
+}
+class SilverMember extends Member {
+    SilverMember(String memberId) { super(memberId); }
+}
+class GoldMember extends SilverMember {
+    GoldMember(String memberId) { super(memberId); }
+    // 演示规则：金卡积分加倍，直接访问父类protected成员
+    @Override
+    void addPoints(long paidCents) { points += paidCents / 100 * 2; }
+}
+// 同包协作类：使用default方法访问会员数据
+class MemberLevelPolicy {
+    Member upgrade(Member m) {
+        return m.points >= 10000 ? new GoldMember(m.getMemberId()) : m;
+    }
+}
+// 统一入口：由REST或RPC适配层导出
 public class MemberService {
-
-    private final Map<String, MemberCard> cards = new HashMap<>();
-    private final Map<String, PointsLedger> ledgers = new HashMap<>();
+    private final Map<String, Member> members = new HashMap<>();
     private final AccessPolicy policy;
-
-    public MemberService(AccessPolicy policy) {
-        this.policy = policy;
-    }
-
-    public void register(String caller, String memberId, MemberCard card) {
+    public MemberService(AccessPolicy policy) { this.policy = policy; }
+    public void register(String caller, String memberId) {
         policy.check(caller, memberId, "REGISTER");
-        cards.put(memberId, card);
+        members.put(memberId, new Member(memberId));
     }
-
-    public int discountPercentOf(String caller, String memberId) {
-        policy.check(caller, memberId, "DISCOUNT");
-        MemberCard card = cards.get(memberId);
-        return card == null ? 100 : card.discountPercent();
-    }
-
     public void addPoints(String caller, String memberId, long paidCents) {
         policy.check(caller, memberId, "POINTS");
-        // 演示规则：每满100分记1积分
-        ledgers.computeIfAbsent(memberId, id -> new PointsLedger()).add(paidCents / 100);
+        members.get(memberId).addPoints(paidCents);
     }
-
-    /** 配套代码补充的只读查询，便于测试核对积分 */
-    public long pointsOf(String caller, String memberId) {
-        policy.check(caller, memberId, "POINTS");
-        PointsLedger ledger = ledgers.get(memberId);
-        return ledger == null ? 0L : ledger.points();
+    public void consume(String caller, String memberId, long amountCents) {
+        policy.check(caller, memberId, "CONSUME");
+        members.get(memberId).consume(amountCents);
     }
+    // 配套代码补充：包级私有查询，仅供同包测试核对状态，包外不可见
+    Member find(String memberId) { return members.get(memberId); }
+}
+interface AccessPolicy {
+    void check(String caller, String memberId, String purpose);
 }

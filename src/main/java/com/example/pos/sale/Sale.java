@@ -1,3 +1,7 @@
+// 代码2-4  Sale委托明细计算小计并汇总（关键代码）
+// 代码2-7  创建职责的分配链（正例）——Sale部分
+// 代码2-22 按卡种分支的会员打折代码（重构前）中的业务端方法 finalPriceCents（重构后一行未改，见代码2-23）
+// 代码2-26 Sale依赖TaxAdapter完成税费计算（正例）
 package com.example.pos.sale;
 
 import com.example.pos.member.MemberCard;
@@ -5,12 +9,10 @@ import com.example.pos.tax.TaxAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * 销售单领域对象（代码2-4、2-7、2-22、2-25）。
- * 掌握明细行集合，负责汇总整单金额（信息专家原则）；
- * 与 SaleLineItem 为组合关系，负责创建明细行（创建者原则）。
+ * 销售单：持有全部明细，负责汇总与整单优惠（信息专家）、创建明细（创建者）、
+ * 委托 TaxAdapter 计税（间接）；状态变更（close/markPending）供2.4、2.6节使用。
  */
 public class Sale {
 
@@ -19,21 +21,9 @@ public class Sale {
     private SaleStatus status = SaleStatus.OPEN;
     private String pendingTradeNo;
 
-    public Sale() {
-    }
-
-    /** 便捷构造：等价于 new Sale() 后调用 setTaxAdapter。 */
-    public Sale(TaxAdapter taxAdapter) {
-        setTaxAdapter(taxAdapter);
-    }
-
-    /** 代码2-25：由装配代码替换计税适配器。 */
-    public void setTaxAdapter(TaxAdapter taxAdapter) {
-        this.taxAdapter = Objects.requireNonNull(taxAdapter, "计税适配器不能为空");
-    }
-
-    /** 代码2-4、2-7：明细由小票创建（组合关系，流水行不能离开小票单独存在）。 */
+    // ---------- 代码2-4、代码2-7 ----------
     public void addLineItem(Item item, int quantity) {
+        // 由Sale统一创建流水，维护它与本小票的归属关系
         SaleLineItem line = new SaleLineItem(item, quantity);
         lineItems.add(line);
     }
@@ -42,37 +32,41 @@ public class Sale {
         return List.copyOf(lineItems);
     }
 
-    public boolean hasItems() {
-        return !lineItems.isEmpty();
-    }
-
-    /** 代码2-4 合计：只汇总各行小计，不越级读取商品单价（信息专家原则）。 */
     public long totalCents() {
         long total = 0L;
         for (SaleLineItem line : lineItems) {
-            total = Math.addExact(total, line.subtotalCents());
+            total = Math.addExact(total, line.subtotalCents());   // 只调用明细的小计契约
         }
         return total;
     }
 
-    /**
-     * 整单应付：沿用第一章规则——商品总额满 4000 分减 500 分。
-     * 整单条件需要整单信息，由持有明细集合的 Sale 判断（信息专家原则）。
-     */
     public long amountDueCents() {
         long base = totalCents();
-        long discount = base >= 4000L ? 500L : 0L;
+        long discount = base >= 4000L ? 500L : 0L;                // 整单条件由Sale判断
         return Math.subtractExact(base, discount);
     }
 
-    /** 代码2-22：面向抽象契约调用，不关心具体是哪一种会员卡（多态原则）。 */
+    // ---------- 代码2-22/2-23 业务端代码 ----------
+    // 业务端代码：只调用折扣方法，重构时保持不变
     public long finalPriceCents(MemberCard card, long totalCents) {
         return totalCents * card.discountPercent() / 100;
     }
 
-    /** 代码2-25：委托中间对象 TaxAdapter 计算税额（间接原则）。 */
+    // ---------- 代码2-26 ----------
+    public void setTaxAdapter(TaxAdapter taxAdapter) {    // 由装配代码替换
+        if (taxAdapter == null) {
+            throw new IllegalArgumentException("计税适配器不能为空");
+        }
+        this.taxAdapter = taxAdapter;
+    }
+
     public long taxCents(long grossCents) {
-        return taxAdapter.taxOf(grossCents);
+        return taxAdapter.taxOf(grossCents);       // 经中间类动态取得税率
+    }
+
+    // ---------- 2.4、2.6 节使用的状态方法 ----------
+    public boolean hasItems() {
+        return !lineItems.isEmpty();
     }
 
     public SaleStatus getStatus() {
@@ -83,7 +77,7 @@ public class Sale {
         return status == SaleStatus.SETTLED || status == SaleStatus.CANCELLED;
     }
 
-    /** 状态变更归小票自己，外部只能通过方法请求，不能直接改字段。 */
+    /** 状态变更归小票自己：paid 为 true 表示已收款结清，false 表示作废。 */
     public void close(boolean paid) {
         if (isClosed()) {
             return;
@@ -91,6 +85,7 @@ public class Sale {
         this.status = paid ? SaleStatus.SETTLED : SaleStatus.CANCELLED;
     }
 
+    /** 支付待确认：登记流水号，不按失败处理。 */
     public void markPending(String tradeNo) {
         this.status = SaleStatus.PENDING;
         this.pendingTradeNo = tradeNo;

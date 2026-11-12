@@ -1,12 +1,10 @@
+// 代码2-19  结算用例的控制器（正例·片段）所调用的商品档案查询 ItemCatalog.lookup(barcode)
 package com.example.pos.sale;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * 商品档案查询服务（2.2.2、2.4.2）。
- * 提供受控的只读查询与商品登记入口，避免外部直接修改内部Map（对比代码2-10公共耦合反例）。
- */
+/** 商品档案查询：按条码查找商品；预置第一章固定小票的商品A（1250分）与商品B（800分）。 */
 public final class ItemCatalog {
 
     private static final Map<String, Item> ITEMS = new ConcurrentHashMap<>();
