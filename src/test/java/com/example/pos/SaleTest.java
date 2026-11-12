@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * 代码清单2-4：小票职责分配的断言（2.2.1、2.2.3）。
+ * 代码2-5：小票职责分配的断言（2.2.1）；被测实现见代码2-4。
  * 固定数据沿用章首的4900分小票：商品A 1250分×2，商品B 800分×3。
  */
 class SaleTest {

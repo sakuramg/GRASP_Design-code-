@@ -3,7 +3,7 @@ package com.example.pos.checkout;
 import com.example.pos.sale.Sale;
 
 /**
- * 代码清单2-26：结果处理的实现（片段，2.6.2）。
+ * 代码2-27：结果处理的实现（片段，2.6.2）。
  * 支付完成回调处理器：协调小票状态变更、触发后续打印并切回UI线程刷新界面。
  */
 public class CheckoutCompletion implements PaymentCallback {
@@ -16,22 +16,15 @@ public class CheckoutCompletion implements PaymentCallback {
         this.uiExecutor = uiExecutor;
     }
 
-    public CheckoutCompletion(UiExecutor uiExecutor) {
-        this(null, uiExecutor);
-    }
-
     @Override
     public void onSuccess(Sale sale) {
         if (sale.isClosed()) {
-            return;                                     // 幂等保护：已关闭的小票忽略重复回调
+            return;                                     // 重复通知不再处理
         }
-        sale.close(true);                               // 状态变更归小票自己（信息专家）
-        if (controller != null) {
-            long taxCents = controller.calculateTaxCents(); // 委托计算税额
-            controller.onPaid(taxCents);                    // 通知控制器驱动打印小票
-        }
+        sale.close(true);                               // 状态变更由销售单完成
+        controller.onPaid(controller.calculateTaxCents());  // 驱动打印小票
         uiExecutor.execute(() ->
-                showMessage("支付成功，合计：" + sale.totalCents() + "分"));
+                showMessage("支付成功，应付：" + sale.amountDueCents() + "分"));
     }
 
     @Override
@@ -41,8 +34,7 @@ public class CheckoutCompletion implements PaymentCallback {
 
     @Override
     public void onPending(Sale sale, String tradeNo) {
-        // 结果尚未确定：登记平台流水号并标记待确认，严禁直接当作失败处理
-        sale.markPending(tradeNo);
+        sale.markPending(tradeNo);                      // 登记流水号，不按失败处理
         uiExecutor.execute(() -> showMessage("等待顾客在手机端确认支付，请稍候"));
     }
 

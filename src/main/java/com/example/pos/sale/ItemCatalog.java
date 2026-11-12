@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 商品档案查询服务（2.2.2、2.4.2）。
- * 提供受控的只读查询与商品登记入口，避免外部直接修改内部Map（对比代码清单2-10反例）。
+ * 提供受控的只读查询与商品登记入口，避免外部直接修改内部Map（对比代码2-10公共耦合反例）。
  */
 public final class ItemCatalog {
 

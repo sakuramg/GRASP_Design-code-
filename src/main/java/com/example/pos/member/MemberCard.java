@@ -1,7 +1,7 @@
 package com.example.pos.member;
 
 /**
- * 代码清单2-21：会员折扣的多态实现（正例，2.5.1）。
+ * 代码2-22：会员折扣的多态实现（正例，2.5.1）。
  * 会员卡抽象基类：定义稳定的折扣契约。
  */
 public abstract class MemberCard {

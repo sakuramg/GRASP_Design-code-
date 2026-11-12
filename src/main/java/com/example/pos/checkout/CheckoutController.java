@@ -6,7 +6,7 @@ import com.example.pos.sale.Sale;
 import com.example.pos.tax.TaxAdapter;
 
 /**
- * 代码清单2-17：结算用例的控制器（正例·片段，2.4.2）。
+ * 代码2-18：结算用例的控制器（正例·片段，2.4.2）。
  * 承接结算场景下的系统事件，只负责接收事件、检查用例前置条件并按序协调调用，不亲自执行业务计算。
  */
 public class CheckoutController {

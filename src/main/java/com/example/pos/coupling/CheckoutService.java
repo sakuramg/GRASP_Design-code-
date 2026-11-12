@@ -3,7 +3,7 @@ package com.example.pos.coupling;
 import java.util.Objects;
 
 /**
- * 代码清单2-7：第一章代码清单1-2中的打印契约与注入（节选，2.3.1）。
+ * 代码2-8：依据第一章代码1-2改写的打印接口与注入（，2.3.1）。
  */
 public final class CheckoutService {
 

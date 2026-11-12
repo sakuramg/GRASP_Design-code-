@@ -1,7 +1,7 @@
 package com.example.pos.tax;
 
 /**
- * 税率配置源（2.5.2，代码清单2-23）。
+ * 税率配置源（2.5.2，代码2-24）。
  * 真实系统通过配置中心下发并按生效时间管理，不在业务代码里硬编码。
  */
 public final class TaxPolicyConfig {

@@ -1,5 +1,6 @@
 /**
- * 代码清单2-28：前端Promise异步请求与链式回调（示例，2.6.2案例2-7）。
+ * 2.6.2正文提到的前端Promise链式回调示意（axios.get(url).then(…).catch(…).finally(…)）。
+ * 定稿正文未为其单列代码编号，此文件仅作补充示例。
  */
 function fetchAndRenderReceipt(axios, renderReceipt, showError, hideLoading) {
     return axios.get('/api/sale/12345')

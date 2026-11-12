@@ -23,7 +23,7 @@ public class Item {
     }
 
     /**
-     * 修改价格。合法性校验由商品对象自己负责（代码清单2-12正例调用此入口）。
+     * 修改价格。合法性校验由商品对象自己负责（代码2-12正例调用此入口）。
      */
     public void changePrice(long newPriceCents) {
         if (newPriceCents < 0) {

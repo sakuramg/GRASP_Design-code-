@@ -7,6 +7,7 @@ import com.example.pos.checkout.PaymentReceipt;
 import com.example.pos.checkout.PaymentService;
 import com.example.pos.checkout.SettleButton;
 import com.example.pos.checkout.SystemOperation;
+import com.example.pos.sale.ItemCatalog;
 import com.example.pos.sale.Register;
 import com.example.pos.sale.Sale;
 import com.example.pos.sale.SaleStatus;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,14 +35,22 @@ class CheckoutControllerTest {
         AtomicInteger printCount = new AtomicInteger(0);
         AtomicInteger uiCount = new AtomicInteger(0);
 
+        AtomicLong chargedCents = new AtomicLong(-1L);
+        AtomicLong printedTaxCents = new AtomicLong(-1L);
         PaymentService paymentService = new PaymentService(
-                amount -> PaymentReceipt.success("TX-1001"),
+                amount -> {
+                    chargedCents.set(amount);
+                    return PaymentReceipt.success("TX-1001");
+                },
                 Runnable::run   // 同步执行器便于确定性断言
         );
         CheckoutController controller = new CheckoutController(
                 sale,
                 new TaxAdapter(),
-                (s, tax) -> printCount.incrementAndGet(),
+                (s, tax) -> {
+                    printCount.incrementAndGet();
+                    printedTaxCents.set(tax);
+                },
                 paymentService
         );
         CheckoutCompletion completion = new CheckoutCompletion(controller, task -> {
@@ -48,10 +58,12 @@ class CheckoutControllerTest {
             task.run();
         });
 
-        controller.onBarcodeScanned("A");
-        controller.onBarcodeScanned("B");
+        controller.onBarcodeScanned(ItemCatalog.lookup("A"), 2);
+        controller.onBarcodeScanned(ItemCatalog.lookup("B"), 3);
         controller.onSettlePressed(completion);
 
+        assertEquals(4400L, chargedCents.get(), "按优惠后应付金额amountDueCents扣款");
+        assertEquals(128L, printedTaxCents.get(), "小票拆分展示的税额");
         assertEquals(SaleStatus.SETTLED, sale.getStatus());
         assertEquals(1, printCount.get(), "支付成功触发一次打印");
         assertEquals(1, uiCount.get(), "UI提示触发一次");
@@ -82,6 +94,34 @@ class CheckoutControllerTest {
 
         assertEquals(SaleStatus.PENDING, sale.getStatus());
         assertEquals("TX-PENDING-99", sale.getPendingTradeNo());
+    }
+
+    @Test
+    @DisplayName("支付明确拒绝（Failure）：小票保持未关闭，不打印")
+    void asyncCheckoutFailureKeepsSaleOpen() {
+        Sale sale = new Register().newSale();
+        AtomicInteger printCount = new AtomicInteger(0);
+        AtomicReference<String> reason = new AtomicReference<>();
+        PaymentService paymentService = new PaymentService(
+                amount -> {
+                    throw new IllegalStateException("余额不足");
+                },
+                Runnable::run
+        );
+        CheckoutController controller = new CheckoutController(
+                sale, new TaxAdapter(), (s, tax) -> printCount.incrementAndGet(), paymentService);
+        CheckoutCompletion completion = new CheckoutCompletion(controller, Runnable::run) {
+            @Override
+            public void onFailure(Sale s, String r) {
+                reason.set(r);
+                super.onFailure(s, r);
+            }
+        };
+        controller.onBarcodeScanned("A");
+        controller.onSettlePressed(completion);
+        assertEquals(SaleStatus.OPEN, sale.getStatus());
+        assertEquals(0, printCount.get());
+        assertTrue(reason.get().contains("余额不足"));
     }
 
     @Test

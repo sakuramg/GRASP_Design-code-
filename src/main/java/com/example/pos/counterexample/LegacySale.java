@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 代码清单2-3：小票合计的越级计算（反例，2.1.1）。
+ * 代码2-3：小票合计的越级计算（反例，2.1.1）。
  * 正例见 com.example.pos.sale.Sale#totalCents()。
  */
 @Deprecated

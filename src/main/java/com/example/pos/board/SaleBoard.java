@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 代码清单2-19：键位与功能的装配（2.5.1，图2-10）。
+ * 代码2-20：键位与功能的装配（2.5.1，图2-10）。
  */
 public class SaleBoard {
 
@@ -20,7 +20,7 @@ public class SaleBoard {
         return buttons.computeIfAbsent(key, k -> new Button());
     }
 
-    /** 演示代码清单2-19的键位装配过程 */
+    /** 演示代码2-20的键位装配过程 */
     public static SaleBoard createDefaultConfiguredBoard() {
         SaleBoard board = new SaleBoard();
         board.getButton("M").setAction(new QueryMemberAction());   // M键 = 查询会员
@@ -32,21 +32,21 @@ public class SaleBoard {
     public static class QueryMemberAction implements Action {
         @Override
         public void execute() {
-            // 执行查询会员操作
+            System.out.println("执行查询会员");
         }
     }
 
     public static class VipPaymentAction implements Action {
         @Override
         public void execute() {
-            // 执行会员储值消费操作
+            System.out.println("执行会员储值消费");
         }
     }
 
     public static class ItemQueryAction implements Action {
         @Override
         public void execute() {
-            // 执行商品查询操作
+            System.out.println("执行商品查询");
         }
     }
 }

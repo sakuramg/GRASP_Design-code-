@@ -3,7 +3,7 @@ package com.example.pos.sale;
 import java.util.Objects;
 
 /**
- * 代码清单2-2：正式类SaleLineItem的成交价快照实现（2.1.1、2.2.1）。
+ * 代码2-2：SaleLineItem保存成交价快照（2.1.1、2.2.1）。
  * 掌握购买数量与成交单价快照，负责计算本行小计（信息专家原则）。
  */
 public class SaleLineItem {

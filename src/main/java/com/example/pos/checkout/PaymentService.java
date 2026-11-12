@@ -7,8 +7,8 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 
 /**
- * 代码清单2-27：异步支付与回调的登记（片段，2.6.2）。
- * 支付服务：封装异步扣款调度并在结果返回后触发回调契约。
+ * 代码2-28：异步支付与回调的登记（片段，2.6.2）。
+ * 支付服务：按优惠后应付金额 amountDueCents 异步扣款，结果返回后触发回调接口。
  */
 public class PaymentService {
 
@@ -27,10 +27,10 @@ public class PaymentService {
     /** 发起异步支付：调用后立即返回，网关响应后按状态反向调用 callback */
     public void payAsync(Sale sale, PaymentCallback callback) {
         CompletableFuture
-                .supplyAsync(() -> gateway.charge(sale.totalCents()), executor)
+                .supplyAsync(() -> gateway.charge(sale.amountDueCents()), executor)
                 .whenComplete((receipt, ex) -> {
                     if (ex != null) {
-                        callback.onFailure(sale, ex.getMessage());
+                        callback.onFailure(sale, ex.getMessage());  // 适配器只对明确拒绝抛出异常
                     } else if (receipt.isPending()) {
                         callback.onPending(sale, receipt.tradeNo());
                     } else {

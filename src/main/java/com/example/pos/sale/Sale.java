@@ -8,27 +8,31 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 销售单领域对象（代码清单2-6、2-21、2-24）。
+ * 销售单领域对象（代码2-4、2-7、2-22、2-25）。
  * 掌握明细行集合，负责汇总整单金额（信息专家原则）；
  * 与 SaleLineItem 为组合关系，负责创建明细行（创建者原则）。
  */
 public class Sale {
 
     private final List<SaleLineItem> lineItems = new ArrayList<>();
-    private final TaxAdapter taxAdapter;
+    private TaxAdapter taxAdapter = new TaxAdapter();
     private SaleStatus status = SaleStatus.OPEN;
     private String pendingTradeNo;
 
     public Sale() {
-        this(new TaxAdapter());
     }
 
-    /** 代码清单2-24：Sale 依赖 TaxAdapter 完成税费计算（间接原则）。 */
+    /** 便捷构造：等价于 new Sale() 后调用 setTaxAdapter。 */
     public Sale(TaxAdapter taxAdapter) {
+        setTaxAdapter(taxAdapter);
+    }
+
+    /** 代码2-25：由装配代码替换计税适配器。 */
+    public void setTaxAdapter(TaxAdapter taxAdapter) {
         this.taxAdapter = Objects.requireNonNull(taxAdapter, "计税适配器不能为空");
     }
 
-    /** 代码清单2-6：流水行由小票创建（组合关系，流水行不能离开小票单独存在）。 */
+    /** 代码2-4、2-7：明细由小票创建（组合关系，流水行不能离开小票单独存在）。 */
     public void addLineItem(Item item, int quantity) {
         SaleLineItem line = new SaleLineItem(item, quantity);
         lineItems.add(line);
@@ -42,7 +46,7 @@ public class Sale {
         return !lineItems.isEmpty();
     }
 
-    /** 合计：只汇总各行小计，不越级读取商品单价（信息专家原则）。 */
+    /** 代码2-4 合计：只汇总各行小计，不越级读取商品单价（信息专家原则）。 */
     public long totalCents() {
         long total = 0L;
         for (SaleLineItem line : lineItems) {
@@ -61,14 +65,14 @@ public class Sale {
         return Math.subtractExact(base, discount);
     }
 
-    /** 代码清单2-21：面向抽象契约调用，不关心具体是哪一种会员卡（多态原则）。 */
+    /** 代码2-22：面向抽象契约调用，不关心具体是哪一种会员卡（多态原则）。 */
     public long finalPriceCents(MemberCard card, long totalCents) {
         return totalCents * card.discountPercent() / 100;
     }
 
-    /** 代码清单2-24：委托中间对象 TaxAdapter 计算税额（间接原则）。 */
-    public long taxCents(long totalCents) {
-        return taxAdapter.taxOf(totalCents);
+    /** 代码2-25：委托中间对象 TaxAdapter 计算税额（间接原则）。 */
+    public long taxCents(long grossCents) {
+        return taxAdapter.taxOf(grossCents);
     }
 
     public SaleStatus getStatus() {

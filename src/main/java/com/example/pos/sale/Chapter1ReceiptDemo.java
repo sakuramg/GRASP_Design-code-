@@ -3,7 +3,7 @@ package com.example.pos.sale;
 import java.util.List;
 
 /**
- * 代码清单2-1：第一章代码清单1-3中的行小计、汇总与整单优惠（节选）。
+ * 代码2-1：依据第一章代码1-3改写的行小计、汇总与整单优惠。
  */
 public final class Chapter1ReceiptDemo {
 

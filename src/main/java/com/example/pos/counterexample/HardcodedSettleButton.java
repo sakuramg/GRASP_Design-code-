@@ -1,33 +1,36 @@
 package com.example.pos.counterexample;
 
+import com.example.pos.checkout.Printer;
+import com.example.pos.sale.Sale;
+
 import javax.swing.JButton;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * 代码清单2-14、2-15：控制器原则反例合集（2.4.1）。
- * 含把功能写死在界面控件中（代码清单2-14）与业务对象直接实现硬件监听接口（代码清单2-15）。
+ * 代码2-15：把功能写死在界面控件中（反例，2.4.1）。
+ * 正例见 com.example.pos.checkout.SettleButton 与 EventSink（代码2-17）。
  */
 @Deprecated
 public class HardcodedSettleButton extends JButton implements ActionListener {
 
-    public HardcodedSettleButton() {
+    private final Sale sale;
+    private final Printer printer;
+    private final int discountPercent;          // 会员折扣百分数
+
+    public HardcodedSettleButton(Sale sale, Printer printer, int discountPercent) {
         super("结算");
-        setSize(120, 70);
+        this.sale = sale;
+        this.printer = printer;
+        this.discountPercent = discountPercent;
         addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        // 反例（代码清单2-14）：把结算算价、打印、状态变更与积分逻辑全部硬编码在按钮控件内部
-    }
-
-    /** 代码清单2-15：业务对象直接监听外部设备事件反例示意 */
-    public interface BarcodeListener {
-        void onBarcode(String barcode);
-    }
-
-    public interface KeyListener {
-        void onPrintKey();
+        // 反例：算价、计税、打印和改状态全部写在按钮内部
+        long payableCents = sale.amountDueCents() * discountPercent / 100;
+        printer.printReceipt(sale, sale.taxCents(payableCents));
+        sale.close(true);
     }
 }
